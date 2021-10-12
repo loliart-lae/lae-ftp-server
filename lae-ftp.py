@@ -135,7 +135,7 @@ if __name__ == "__main__":
     # 判断日志目录是否存在
     if (os.path.exists('logs')) == False:
         os.mkdir('logs')
-    log_name = 'logs/lae-ftp-' + time.strftime("%Y-%m-%d-%H-%M", time.localtime()) + '.log'
+    log_name = 'logs/lae-ftp-' + time.strftime("%Y-%m-%d-%H%M%S", time.localtime()) + '.log'
     # 配置日志文件
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
