@@ -112,7 +112,7 @@ class user_config(threading.Thread):
                     # 覆盖新用户列表
                     self.user = new_user
             except:
-                print('[ERROR {}] [main] Error reading user config.'.format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),))
+                print('[E {}] [main] Error reading user config.'.format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),))
             #print(self.user)
             time.sleep(1)
 
@@ -120,7 +120,7 @@ public_data = {}
 user_config_file = ''
 
 if __name__ == "__main__":
-    print('[INFO {}] [main] Checking file integrity...'.format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),))
+    print('[I {}] [main] Checking file integrity...'.format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),))
 
     config_path = 'config.yml'
     # 若配置文件不存在，则创建空白配置文件
