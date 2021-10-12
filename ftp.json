@@ -1,0 +1,14 @@
+{
+    "sites": [
+        {
+            "username": "$username",
+            "password": "$md5",
+            "path": "www/$id"
+        },
+        {
+            "username": "$username",
+            "password": "$md5",
+            "path": "www/$id"
+        }
+    ]
+}
