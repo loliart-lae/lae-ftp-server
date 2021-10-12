@@ -13,7 +13,7 @@ def check_file_md5():
     return md5(data).hexdigest()
 
 class DummyMD5Authorizer(DummyAuthorizer):
-    def validate_authentication(self, username, password):
+    def validate_authentication(self, username, password, handler):
         if sys.version_info >= (3, 0):
             password = password.encode('latin1')
         hash = md5(password).hexdigest()
@@ -59,7 +59,7 @@ class config(object):
 
     def create_config(self):
         with open(self.config, 'w') as f:
-            raw_data = [{'global':{'ftp_host':'0.0.0.0','ftp_port':'21','user_config':'ftp.json'}}]
+            raw_data = [{'global':{'ftp_host':'0.0.0.0','ftp_port':21,'user_config':'ftp.json'}}]
             with open(self.config, 'w') as f:
                 yaml.dump(raw_data, f)
 
@@ -86,29 +86,32 @@ class user_config(threading.Thread):
     def check_updates(self):
         file_md5 = check_file_md5()
         while True:
-            if (check_file_md5() != file_md5):
-                # 更新 md5 值
-                file_md5 = check_file_md5()
-                # 检查变更的用户
-                new_user = []
+            try:
+                if (check_file_md5() != file_md5):
+                    # 更新 md5 值
+                    file_md5 = check_file_md5()
+                    # 检查变更的用户
+                    new_user = []
 
-                with open(public_data[0]['global']['user_config'], 'r') as f:
-                    user_data = json.load(f)['sites']
-        
-                for i in range(len(user_data)):
-                    new_user.append(user_data[i]['username'])
-                # 去除已删除部分
-                for user in self.user:
-                    if user not in new_user:
-                        Main.th_ftp.del_user(user)
-                # 添加新增部分
-                i = 0
-                for user in new_user:
-                    if user not in self.user:
-                        Main.th_ftp.add_user(user, user_data[i]['password'], user_data[i]['path'])
-                    i += 1
-                # 覆盖新用户列表
-                self.user = new_user
+                    with open(public_data[0]['global']['user_config'], 'r') as f:
+                        user_data = json.load(f)['sites']
+            
+                    for i in range(len(user_data)):
+                        new_user.append(user_data[i]['username'])
+                    # 去除已删除部分
+                    for user in self.user:
+                        if user not in new_user:
+                            Main.th_ftp.del_user(user)
+                    # 添加新增部分
+                    i = 0
+                    for user in new_user:
+                        if user not in self.user:
+                            Main.th_ftp.add_user(user, user_data[i]['password'], user_data[i]['path'])
+                        i += 1
+                    # 覆盖新用户列表
+                    self.user = new_user
+            except:
+                print('[ERROR {}] [main] Error reading user config.'.format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),))
             #print(self.user)
             time.sleep(1)
 
@@ -116,7 +119,7 @@ public_data = {}
 user_config_file = ''
 
 if __name__ == "__main__":
-    print('[I {}] [main] Checking file integrity...'.format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),))
+    print('[INFO {}] [main] Checking file integrity...'.format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),))
 
     config_path = 'config.yml'
     # 若配置文件不存在，则创建空白配置文件
