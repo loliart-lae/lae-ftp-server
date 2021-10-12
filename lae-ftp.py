@@ -3,8 +3,9 @@
 from pyftpdlib.authorizers import DummyAuthorizer, AuthenticationFailed
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
+from pyftpdlib.log import LogFormatter
 from hashlib import md5
-import threading,sys,yaml,os,time,json
+import threading,sys,yaml,os,time,json,logging
 
 # 检查用户文件 md5 值
 def check_file_md5():
@@ -29,7 +30,7 @@ class ftp_server(threading.Thread):
         self.authorizer = DummyMD5Authorizer()
         self.host = host
         self.port = port
-       
+
     def run(self):
         self.handler = FTPHandler
         self.handler.log_prefix = '[FTP] %(remote_ip)s-[%(username)s]'
@@ -93,7 +94,7 @@ class user_config(threading.Thread):
                     # 检查变更的用户
                     new_user = []
 
-                    with open(public_data[0]['global']['user_config'], 'r') as f:
+                    with open(user_config_file, 'r') as f:
                         user_data = json.load(f)['sites']
             
                     for i in range(len(user_data)):
@@ -130,6 +131,20 @@ if __name__ == "__main__":
     global_data = public_data[0]['global']
     user_config_file = public_data[0]['global']['user_config']
     Main = main(global_data['ftp_host'], global_data['ftp_port'])
+
+    # 判断日志目录是否存在
+    if (os.path.exists('logs')) == False:
+        os.mkdir('logs')
+    log_name = 'logs/lae-ftp-' + time.strftime("%Y-%m-%d-%H-%M", time.localtime()) + '.log'
+    # 配置日志文件
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    ch = logging.StreamHandler()
+    fh = logging.FileHandler(filename=log_name, encoding='utf-8')
+    ch.setFormatter(LogFormatter())
+    fh.setFormatter(LogFormatter())
+    logger.addHandler(ch)
+    logger.addHandler(fh)
 
     # 读取 FTP 配置文件
     th_user_config = user_config()
