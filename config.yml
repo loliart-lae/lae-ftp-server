@@ -1,0 +1,4 @@
+- global:
+    ftp_host: 0.0.0.0
+    ftp_port: '21'
+    user_config: ftp.json
