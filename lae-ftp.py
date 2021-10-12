@@ -7,9 +7,8 @@ from hashlib import md5
 import threading,sys,yaml,os,time,json
 
 # 检查用户文件 md5 值
-def check_file_md5(self):
-    file_name = public_data['user_config']
-    with open(file_name, 'rb') as fp:
+def check_file_md5():
+    with open(user_config_file, 'rb') as fp:
         data = fp.read()
     return md5(data).hexdigest()
 
@@ -75,12 +74,12 @@ class user_config(threading.Thread):
 
         self.user = []
 
-        with open(public_data[0]['global']['user_config'], 'r') as f:
+        with open(user_config_file, 'r') as f:
             user_data = json.load(f)['sites']
         
         for i in range(len(user_data)):
             Main.th_ftp.add_user(user_data[i]['username'], user_data[i]['password'], user_data[i]['path'])
-            self.user.append[user_data[i]['username']]
+            self.user.append(user_data[i]['username'])
         
         self.check_updates()
 
@@ -93,28 +92,28 @@ class user_config(threading.Thread):
                 # 检查变更的用户
                 new_user = []
 
-                with open(public_data['user_config'], 'r') as f:
-                    user_data = json.loads(f)['sites']
+                with open(public_data[0]['global']['user_config'], 'r') as f:
+                    user_data = json.load(f)['sites']
         
-                for i in len(user_data):
-                    new_user.append[user_data[i]['username']]
+                for i in range(len(user_data)):
+                    new_user.append(user_data[i]['username'])
                 # 去除已删除部分
-                for user in self.users:
+                for user in self.user:
                     if user not in new_user:
-                        main.th_ftp.remove_user(user)
+                        Main.th_ftp.del_user(user)
                 # 添加新增部分
                 i = 0
                 for user in new_user:
-                    if user not in self.users:
-                        main.th_ftp.add_user(user, user_data[i]['password'], user_data[i]['path'])
+                    if user not in self.user:
+                        Main.th_ftp.add_user(user, user_data[i]['password'], user_data[i]['path'])
                     i += 1
                 # 覆盖新用户列表
                 self.user = new_user
-            print(self.user)
+            #print(self.user)
             time.sleep(1)
 
-
 public_data = {}
+user_config_file = ''
 
 if __name__ == "__main__":
     print('[I {}] [main] Checking file integrity...'.format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),))
@@ -126,6 +125,7 @@ if __name__ == "__main__":
     config().read_config()
 
     global_data = public_data[0]['global']
+    user_config_file = public_data[0]['global']['user_config']
     Main = main(global_data['ftp_host'], global_data['ftp_port'])
 
     # 读取 FTP 配置文件
