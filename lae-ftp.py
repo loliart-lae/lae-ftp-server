@@ -71,16 +71,17 @@ class config(object):
 
 class user_config(threading.Thread):
     def __init__(self):
-        global public_data
-
-        self.user = []
 
         with open(user_config_file, 'r') as f:
             user_data = json.load(f)['sites']
         
-        for i in range(len(user_data)):
-            Main.th_ftp.add_user(user_data[i]['username'], user_data[i]['password'], user_data[i]['path'])
-            self.user.append(user_data[i]['username'])
+        for user in user_data.keys():
+            Main.th_ftp.add_user(user_data[user]['username'], user_data[user]['password'], user_data[user]['path'])
+        
+        # 将添加 id 和用户名对照
+        self.user = {}
+        for user in user_data.keys():
+            self.user[user] = user_data[user]['username']
         
         self.check_updates()
 
@@ -92,28 +93,26 @@ class user_config(threading.Thread):
                     # 更新 md5 值
                     file_md5 = check_file_md5()
                     # 检查变更的用户
-                    new_user = []
-
                     with open(user_config_file, 'r') as f:
                         user_data = json.load(f)['sites']
-            
-                    for i in range(len(user_data)):
-                        new_user.append(user_data[i]['username'])
+
+                    new_user = {}
+                    for user in user_data.keys():
+                        new_user[user] = user_data[user]['username']
                     # 去除已删除部分
-                    for user in self.user:
+                    for user in self.user.keys():
                         if user not in new_user:
-                            Main.th_ftp.del_user(user)
+                            Main.th_ftp.del_user(self.user[user])
                     # 添加新增部分
                     i = 0
-                    for user in new_user:
+                    for user in new_user.keys():
                         if user not in self.user:
-                            Main.th_ftp.add_user(user, user_data[i]['password'], user_data[i]['path'])
+                            Main.th_ftp.add_user(user_data[user]['username'], user_data[user]['password'], user_data[user]['path'])
                         i += 1
                     # 覆盖新用户列表
                     self.user = new_user
             except:
                 print('[E {}] [main] Error reading user config.'.format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),))
-            #print(self.user)
             time.sleep(1)
 
 public_data = {}
