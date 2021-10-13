@@ -1,14 +1,14 @@
 {
-    "sites": [
-        {
-            "username": "$username",
-            "password": "$md5",
-            "path": "www/$id"
+    "sites": {
+        "site-114514": {
+            "username": "test1",
+            "password": "123",
+            "path": "core\/www\/site-114514"
         },
-        {
-            "username": "$username",
-            "password": "$md5",
-            "path": "www/$id"
+        "site-114512": {
+            "username": "test1",
+            "password": "123",
+            "path": "core\/www\/site-114512"
         }
-    ]
+    }
 }
