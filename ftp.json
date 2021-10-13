@@ -1,12 +1,14 @@
 {
     "sites": {
         "site-114514": {
+            "id": "1",
             "username": "test1",
             "password": "123",
             "path": "core\/www\/site-114514"
         },
         "site-114512": {
-            "username": "test1",
+            "id": "2",
+            "username": "test2",
             "password": "123",
             "path": "core\/www\/site-114512"
         }
